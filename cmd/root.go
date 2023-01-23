@@ -7,7 +7,7 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() error {
-	rootCmd.AddCommand(milliToHourCmd)
+	rootCmd.AddCommand(convertCmd)
 
 	return rootCmd.Execute()
 }

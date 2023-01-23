@@ -8,8 +8,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var milliToHourCmd = &cobra.Command{
-	Use:   "milliToHour",
+var convertCmd = &cobra.Command{
+	Use:   "convert",
 	Short: "A command that converts milliseconds to hour",
 	Args:  cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
 	Run: func(cmd *cobra.Command, args []string) {
