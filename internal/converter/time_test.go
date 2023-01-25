@@ -1,4 +1,4 @@
-package time
+package converter
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestTime_MilliToHour(t *testing.T) {
+func TestConverter_MilliToHour(t *testing.T) {
 	testCases := map[string]func(*testing.T){
 		"should return converted half-hour": func(t *testing.T) {
 			hours, _ := MilliToHour(1000 * 60 * 30) // 30 min

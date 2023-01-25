@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/limeiralucas/chrono-cli/internal/time"
+	"github.com/limeiralucas/chrono-cli/internal/converter"
 	"github.com/spf13/cobra"
 )
 
@@ -19,7 +19,7 @@ var convertCmd = &cobra.Command{
 			panic(err)
 		}
 
-		hours, err := time.MilliToHour(int(milliseconds))
+		hours, err := converter.MilliToHour(int(milliseconds))
 
 		if err != nil {
 			panic(err)
