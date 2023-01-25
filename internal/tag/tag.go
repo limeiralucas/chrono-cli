@@ -1,6 +1,6 @@
 package tag
 
 type Tag struct {
-	id   any
-	name string
+	Id   int
+	Name string
 }
