@@ -68,6 +68,59 @@ func TestTimeEntryRepository_Create(t *testing.T) {
 
 			assert.Error(t, err, "error on provider")
 		},
+		"should call provider.AddTags": func(t *testing.T) {
+			newTags := []tag.Tag{
+				{Id: 1, Name: "Tag 1"},
+				{Id: 2, Name: "Tag 2"},
+			}
+			provider.On("AddTags", 1, newTags).Return(nil).Once()
+
+			err := repo.AddTags(1, newTags)
+
+			provider.AssertNumberOfCalls(t, "AddTags", 1)
+			assert.Nil(t, err)
+		},
+		"should forward error from provider.AddTags": func(t *testing.T) {
+			provider.On("AddTags", 1, []tag.Tag(nil)).Return(errors.New("error on provider")).Once()
+
+			err := repo.AddTags(1, nil)
+
+			assert.Error(t, err, "error on provider")
+		},
+		"should call provider.RemoveTags": func(t *testing.T) {
+			tagsToBeRemove := []tag.Tag{
+				{Id: 1, Name: "Tag 1"},
+			}
+			provider.On("RemoveTags", 1, tagsToBeRemove).Return(nil).Once()
+
+			err := repo.RemoveTags(1, tagsToBeRemove)
+
+			provider.AssertNumberOfCalls(t, "RemoveTags", 1)
+			assert.Nil(t, err)
+		},
+
+		"should forward error from provider.RemoveTags": func(t *testing.T) {
+			provider.On("RemoveTags", 1, []tag.Tag(nil)).Return(errors.New("error on provider")).Once()
+
+			err := repo.RemoveTags(1, nil)
+
+			assert.Error(t, err, "error on provider")
+		},
+		"should call provider.UpdateTitle": func(t *testing.T) {
+			provider.On("UpdateTitle", 1, "New title").Return(nil).Once()
+
+			err := repo.UpdateTitle(1, "New title")
+
+			assert.Nil(t, err)
+			provider.AssertNumberOfCalls(t, "UpdateTitle", 1)
+		},
+		"should forward error from provider.UpdateTitle": func(t *testing.T) {
+			provider.On("UpdateTitle", 1, "").Return(errors.New("error on provider")).Once()
+
+			err := repo.UpdateTitle(1, "")
+
+			assert.Error(t, err, "error on provider")
+		},
 	}
 
 	for name, run := range testCases {

@@ -14,6 +14,20 @@ type TimeEntryProvider struct {
 	mock.Mock
 }
 
+// AddTags provides a mock function with given fields: id, tags
+func (_m *TimeEntryProvider) AddTags(id int, tags []tag.Tag) error {
+	ret := _m.Called(id, tags)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(int, []tag.Tag) error); ok {
+		r0 = rf(id, tags)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // Create provides a mock function with given fields: title, startDate, tags
 func (_m *TimeEntryProvider) Create(title string, startDate time.Time, tags []tag.Tag) (int, error) {
 	ret := _m.Called(title, startDate, tags)
@@ -72,9 +86,32 @@ func (_m *TimeEntryProvider) GetTags(id int) ([]tag.Tag, error) {
 	return r0, r1
 }
 
-// Update provides a mock function with given fields: title, tags
-func (_m *TimeEntryProvider) Update(title string, tags []tag.Tag) {
-	_m.Called(title, tags)
+// RemoveTags provides a mock function with given fields: id, tags
+func (_m *TimeEntryProvider) RemoveTags(id int, tags []tag.Tag) error {
+	ret := _m.Called(id, tags)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(int, []tag.Tag) error); ok {
+		r0 = rf(id, tags)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// UpdateTitle provides a mock function with given fields: id, title
+func (_m *TimeEntryProvider) UpdateTitle(id int, title string) error {
+	ret := _m.Called(id, title)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(int, string) error); ok {
+		r0 = rf(id, title)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }
 
 type mockConstructorTestingTNewTimeEntryProvider interface {

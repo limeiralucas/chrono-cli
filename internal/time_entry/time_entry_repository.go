@@ -9,8 +9,10 @@ import (
 type TimeEntryProvider interface {
 	Create(title string, startDate time.Time, tags []tag.Tag) (id int, err error)
 	Delete(id int) error
-	Update(title string, tags []tag.Tag)
 	GetTags(id int) ([]tag.Tag, error)
+	UpdateTitle(id int, title string) error
+	AddTags(id int, tags []tag.Tag) error
+	RemoveTags(id int, tags []tag.Tag) error
 }
 
 type TimeEntryRepository struct {
@@ -31,4 +33,16 @@ func (t TimeEntryRepository) Delete(id int) error {
 
 func (t TimeEntryRepository) GetTags(id int) ([]tag.Tag, error) {
 	return t.provider.GetTags(id)
+}
+
+func (t TimeEntryRepository) AddTags(id int, tags []tag.Tag) error {
+	return t.provider.AddTags(id, tags)
+}
+
+func (t TimeEntryRepository) RemoveTags(id int, tags []tag.Tag) error {
+	return t.provider.RemoveTags(id, tags)
+}
+
+func (t TimeEntryRepository) UpdateTitle(id int, title string) error {
+	return t.provider.UpdateTitle(id, title)
 }
