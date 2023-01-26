@@ -7,125 +7,184 @@ import (
 
 	"github.com/limeiralucas/chrono-cli/internal/tag"
 	"github.com/limeiralucas/chrono-cli/mocks"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
-func TestTimeEntryRepository_Create(t *testing.T) {
-	provider := mocks.TimeEntryProvider{}
-	repo := NewTimeEntryRepository(&provider)
-	now := time.Now()
+type TestSuite struct {
+	suite.Suite
+	provider *mocks.TimeEntryProvider
+	repo     TimeEntryRepository
+	now      time.Time
+}
 
-	testCases := map[string]func(*testing.T){
-		"should call provider.Create and return id": func(t *testing.T) {
-			provider.On("Create", "entry", now, []tag.Tag(nil)).Return(1, nil).Once()
+func (s *TestSuite) SetupSuite() {
+	s.now = time.Now()
+}
 
-			id, err := repo.Create("entry", now)
+func (s *TestSuite) ResetMocks() {
+	s.provider = mocks.NewTimeEntryProvider(s.T())
+	s.repo = NewTimeEntryRepository(s.provider)
+}
 
-			provider.AssertNumberOfCalls(t, "Create", 1)
-			assert.Equal(t, 1, id)
-			assert.Nil(t, err)
+func TestTimeEntryRepository(t *testing.T) {
+	suite.Run(t, new(TestSuite))
+}
+
+func (s *TestSuite) Test_Create() {
+	t := s.T()
+
+	type ExpectedReturn struct {
+		expectedId  int
+		expectedErr error
+	}
+
+	cases := map[string]ExpectedReturn{
+		"should call provider.Create and return id": {
+			expectedId:  1,
+			expectedErr: nil,
 		},
-		"should forward error from provider.Create": func(t *testing.T) {
-			provider.On("Create", "entry", now, []tag.Tag(nil)).Return(0, errors.New("error on provider")).Once()
-
-			id, err := repo.Create("entry", now)
-
-			assert.Equal(t, 0, id)
-			assert.Error(t, err, "error on provider")
+		"should forward error from provider.Create": {
+			expectedId:  0,
+			expectedErr: errors.New("error on provider.Create"),
 		},
-		"should call provider.Delete": func(t *testing.T) {
-			provider.On("Delete", 1).Return(nil).Once()
+	}
 
-			err := repo.Delete(1)
+	for name, er := range cases {
+		s.ResetMocks()
+		s.Run(name, func() {
+			s.provider.On("Create", "entry", s.now).Return(er.expectedId, er.expectedErr).Once()
 
-			provider.AssertNumberOfCalls(t, "Delete", 1)
-			assert.Nil(t, err)
-		},
-		"should forward error from provider.Delete": func(t *testing.T) {
-			provider.On("Delete", 1).Return(errors.New("error on provider")).Once()
+			id, err := s.repo.Create("entry", s.now)
 
-			err := repo.Delete(1)
+			s.provider.AssertNumberOfCalls(t, "Create", 1)
+			s.Equal(er.expectedId, id)
+			s.Equal(err, er.expectedErr)
+		})
+	}
+}
 
-			assert.Error(t, err, "error on provider")
-		},
-		"should call provider.GetTags and return tags": func(t *testing.T) {
-			expectedTags := []tag.Tag{
+func (s *TestSuite) Test_Delete() {
+	t := s.T()
+
+	cases := map[string]error{
+		"should call provider.Delete":               nil,
+		"should forward error from provider.Delete": errors.New("error on provider.Delete"),
+	}
+
+	for name, expectedErr := range cases {
+		s.ResetMocks()
+		s.Run(name, func() {
+			s.provider.On("Delete", 1).Return(expectedErr).Once()
+			err := s.repo.Delete(1)
+
+			s.provider.AssertNumberOfCalls(t, "Delete", 1)
+			s.Equal(expectedErr, err)
+		})
+	}
+}
+
+func (s *TestSuite) Test_GetTags() {
+	t := s.T()
+
+	type ExpectedReturn struct {
+		expectedTags []tag.Tag
+		expectedErr  error
+	}
+
+	cases := map[string]ExpectedReturn{
+		"should call provider.GetTags and return tags": {
+			expectedTags: []tag.Tag{
 				{Id: 1, Name: "Tag 1"},
 				{Id: 2, Name: "Tag 2"},
-			}
-			provider.On("GetTags", 1).Return(expectedTags, nil).Once()
-
-			tags, err := repo.GetTags(1)
-
-			provider.AssertNumberOfCalls(t, "GetTags", 1)
-			assert.Equal(t, expectedTags, tags)
-			assert.Nil(t, err)
+			},
+			expectedErr: nil,
 		},
-		"should forward error from provider.GetTags": func(t *testing.T) {
-			provider.On("GetTags", 1).Return(nil, errors.New("error on provider")).Once()
-
-			_, err := repo.GetTags(1)
-
-			assert.Error(t, err, "error on provider")
+		"should forward error from provider.GetTags": {
+			expectedTags: nil,
+			expectedErr:  errors.New("error on provider.GetTags"),
 		},
-		"should call provider.AddTags": func(t *testing.T) {
+	}
+
+	for name, er := range cases {
+		s.ResetMocks()
+		s.Run(name, func() {
+			s.provider.On("GetTags", 1).Return(er.expectedTags, er.expectedErr).Once()
+
+			tags, err := s.repo.GetTags(1)
+
+			s.provider.AssertNumberOfCalls(t, "GetTags", 1)
+			s.Equal(er.expectedTags, tags)
+			s.Equal(err, er.expectedErr)
+		})
+	}
+}
+
+func (s *TestSuite) Test_AddTags() {
+	t := s.T()
+
+	cases := map[string]error{
+		"should call provider.AddTags":               nil,
+		"should forward error from provider.AddTags": errors.New("error on provider.AddTags"),
+	}
+
+	for name, expectedErr := range cases {
+		s.ResetMocks()
+		s.Run(name, func() {
 			newTags := []tag.Tag{
 				{Id: 1, Name: "Tag 1"},
 				{Id: 2, Name: "Tag 2"},
 			}
-			provider.On("AddTags", 1, newTags).Return(nil).Once()
 
-			err := repo.AddTags(1, newTags)
+			s.provider.On("AddTags", 1, newTags).Return(expectedErr).Once()
+			err := s.repo.AddTags(1, newTags)
 
-			provider.AssertNumberOfCalls(t, "AddTags", 1)
-			assert.Nil(t, err)
-		},
-		"should forward error from provider.AddTags": func(t *testing.T) {
-			provider.On("AddTags", 1, []tag.Tag(nil)).Return(errors.New("error on provider")).Once()
+			s.provider.AssertNumberOfCalls(t, "AddTags", 1)
+			s.Equal(expectedErr, err)
+		})
+	}
+}
 
-			err := repo.AddTags(1, nil)
+func (s *TestSuite) Test_RemoveTags() {
+	t := s.T()
 
-			assert.Error(t, err, "error on provider")
-		},
-		"should call provider.RemoveTags": func(t *testing.T) {
-			tagsToBeRemove := []tag.Tag{
-				{Id: 1, Name: "Tag 1"},
-			}
-			provider.On("RemoveTags", 1, tagsToBeRemove).Return(nil).Once()
-
-			err := repo.RemoveTags(1, tagsToBeRemove)
-
-			provider.AssertNumberOfCalls(t, "RemoveTags", 1)
-			assert.Nil(t, err)
-		},
-
-		"should forward error from provider.RemoveTags": func(t *testing.T) {
-			provider.On("RemoveTags", 1, []tag.Tag(nil)).Return(errors.New("error on provider")).Once()
-
-			err := repo.RemoveTags(1, nil)
-
-			assert.Error(t, err, "error on provider")
-		},
-		"should call provider.UpdateTitle": func(t *testing.T) {
-			provider.On("UpdateTitle", 1, "New title").Return(nil).Once()
-
-			err := repo.UpdateTitle(1, "New title")
-
-			assert.Nil(t, err)
-			provider.AssertNumberOfCalls(t, "UpdateTitle", 1)
-		},
-		"should forward error from provider.UpdateTitle": func(t *testing.T) {
-			provider.On("UpdateTitle", 1, "").Return(errors.New("error on provider")).Once()
-
-			err := repo.UpdateTitle(1, "")
-
-			assert.Error(t, err, "error on provider")
-		},
+	cases := map[string]error{
+		"should call provider.RemoveTags":               nil,
+		"should forward error from provider.RemoveTags": errors.New("error on provider.RemoveTags"),
 	}
 
-	for name, run := range testCases {
-		t.Run(name, func(t *testing.T) {
-			run(t)
+	for name, expectedErr := range cases {
+		s.ResetMocks()
+		s.Run(name, func() {
+			tagsToBeRemoved := []tag.Tag{
+				{Id: 1, Name: "Tag 1"},
+				{Id: 2, Name: "Tag 2"},
+			}
+
+			s.provider.On("RemoveTags", 1, tagsToBeRemoved).Return(expectedErr).Once()
+			err := s.repo.RemoveTags(1, tagsToBeRemoved)
+
+			s.provider.AssertNumberOfCalls(t, "RemoveTags", 1)
+			s.Equal(expectedErr, err)
+		})
+	}
+}
+
+func (s *TestSuite) Test_UpdateTitle() {
+	t := s.T()
+
+	cases := map[string]error{
+		"should call provider.UpdateTitle":               nil,
+		"should forward error from provider.UpdateTitle": errors.New("error on provider.UpdateTitle"),
+	}
+
+	for name, expectedErr := range cases {
+		s.ResetMocks()
+		s.Run(name, func() {
+			s.provider.On("UpdateTitle", 1, "New Title").Return(expectedErr).Once()
+			err := s.repo.UpdateTitle(1, "New Title")
+
+			s.provider.AssertNumberOfCalls(t, "UpdateTitle", 1)
+			s.Equal(expectedErr, err)
 		})
 	}
 }

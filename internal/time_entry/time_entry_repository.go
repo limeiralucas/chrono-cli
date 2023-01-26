@@ -7,7 +7,7 @@ import (
 )
 
 type TimeEntryProvider interface {
-	Create(title string, startDate time.Time, tags []tag.Tag) (id int, err error)
+	Create(title string, startDate time.Time) (id int, err error)
 	Delete(id int) error
 	GetTags(id int) ([]tag.Tag, error)
 	UpdateTitle(id int, title string) error
@@ -24,7 +24,7 @@ func NewTimeEntryRepository(provider TimeEntryProvider) TimeEntryRepository {
 }
 
 func (t TimeEntryRepository) Create(title string, startDate time.Time) (int, error) {
-	return t.provider.Create(title, startDate, nil)
+	return t.provider.Create(title, startDate)
 }
 
 func (t TimeEntryRepository) Delete(id int) error {

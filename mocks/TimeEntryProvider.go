@@ -28,20 +28,20 @@ func (_m *TimeEntryProvider) AddTags(id int, tags []tag.Tag) error {
 	return r0
 }
 
-// Create provides a mock function with given fields: title, startDate, tags
-func (_m *TimeEntryProvider) Create(title string, startDate time.Time, tags []tag.Tag) (int, error) {
-	ret := _m.Called(title, startDate, tags)
+// Create provides a mock function with given fields: title, startDate
+func (_m *TimeEntryProvider) Create(title string, startDate time.Time) (int, error) {
+	ret := _m.Called(title, startDate)
 
 	var r0 int
-	if rf, ok := ret.Get(0).(func(string, time.Time, []tag.Tag) int); ok {
-		r0 = rf(title, startDate, tags)
+	if rf, ok := ret.Get(0).(func(string, time.Time) int); ok {
+		r0 = rf(title, startDate)
 	} else {
 		r0 = ret.Get(0).(int)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string, time.Time, []tag.Tag) error); ok {
-		r1 = rf(title, startDate, tags)
+	if rf, ok := ret.Get(1).(func(string, time.Time) error); ok {
+		r1 = rf(title, startDate)
 	} else {
 		r1 = ret.Error(1)
 	}
