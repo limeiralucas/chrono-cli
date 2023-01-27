@@ -1,4 +1,4 @@
-package time_entry
+package time_entry_test
 
 import (
 	"errors"
@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/limeiralucas/chrono-cli/internal/tag"
+	"github.com/limeiralucas/chrono-cli/internal/time_entry"
 	"github.com/limeiralucas/chrono-cli/mocks"
 	"github.com/stretchr/testify/suite"
 )
@@ -13,7 +14,7 @@ import (
 type TestSuite struct {
 	suite.Suite
 	provider *mocks.TimeEntryProvider
-	repo     TimeEntryRepository
+	repo     time_entry.TimeEntryRepository
 	now      time.Time
 }
 
@@ -23,7 +24,7 @@ func (s *TestSuite) SetupSuite() {
 
 func (s *TestSuite) ResetMocks() {
 	s.provider = mocks.NewTimeEntryProvider(s.T())
-	s.repo = NewTimeEntryRepository(s.provider)
+	s.repo = time_entry.NewTimeEntryRepository(s.provider)
 }
 
 func TestTimeEntryRepository(t *testing.T) {
