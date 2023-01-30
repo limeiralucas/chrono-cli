@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/limeiralucas/chrono-cli/internal/converter"
+	"github.com/limeiralucas/chrono-cli/internal/pkg/converter"
 	"github.com/spf13/cobra"
 )
 

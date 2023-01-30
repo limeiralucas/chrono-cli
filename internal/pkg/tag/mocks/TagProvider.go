@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	tag "github.com/limeiralucas/chrono-cli/internal/tag"
+	tag "github.com/limeiralucas/chrono-cli/internal/core/tag"
 	mock "github.com/stretchr/testify/mock"
 )
 

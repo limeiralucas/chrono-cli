@@ -4,8 +4,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/limeiralucas/chrono-cli/internal/tag"
-	"github.com/limeiralucas/chrono-cli/mocks"
+	core "github.com/limeiralucas/chrono-cli/internal/core/tag"
+	"github.com/limeiralucas/chrono-cli/internal/pkg/tag"
+	"github.com/limeiralucas/chrono-cli/internal/pkg/tag/mocks"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -26,7 +27,7 @@ func (s *TestSuite) ResetMocks() {
 
 func (s *TestSuite) Test_GetAll() {
 	type ExpectedReturn struct {
-		expectedTags []tag.Tag
+		expectedTags []core.Tag
 		expectedErr  error
 	}
 
@@ -34,7 +35,7 @@ func (s *TestSuite) Test_GetAll() {
 
 	cases := map[string]ExpectedReturn{
 		"should call provider.GetAll": {
-			expectedTags: []tag.Tag{{Id: 1, Name: "Tag 1"}, {Id: 2, Name: "Tag 2"}},
+			expectedTags: []core.Tag{{Id: 1, Name: "Tag 1"}, {Id: 2, Name: "Tag 2"}},
 			expectedErr:  nil,
 		},
 		"should forward error from provider.GetAll": {
@@ -59,7 +60,7 @@ func (s *TestSuite) Test_GetAll() {
 
 func (s *TestSuite) Test_GetById() {
 	type ExpectedReturn struct {
-		expectedTag tag.Tag
+		expectedTag core.Tag
 		expectedErr error
 	}
 
@@ -67,11 +68,11 @@ func (s *TestSuite) Test_GetById() {
 
 	cases := map[string]ExpectedReturn{
 		"should call provider.GetById": {
-			expectedTag: tag.Tag{Id: 1, Name: "Tag 1"},
+			expectedTag: core.Tag{Id: 1, Name: "Tag 1"},
 			expectedErr: nil,
 		},
 		"should forward error from provider.GetById": {
-			expectedTag: tag.Tag{},
+			expectedTag: core.Tag{},
 			expectedErr: errors.New("error on provider.GetById"),
 		},
 	}
@@ -92,7 +93,7 @@ func (s *TestSuite) Test_GetById() {
 
 func (s *TestSuite) Test_GetByName() {
 	type ExpectedReturn struct {
-		expectedTag tag.Tag
+		expectedTag core.Tag
 		expectedErr error
 	}
 
@@ -100,11 +101,11 @@ func (s *TestSuite) Test_GetByName() {
 
 	cases := map[string]ExpectedReturn{
 		"should call provider.GetByName": {
-			expectedTag: tag.Tag{Id: 1, Name: "Tag 1"},
+			expectedTag: core.Tag{Id: 1, Name: "Tag 1"},
 			expectedErr: nil,
 		},
 		"should forward error from provider.GetByName": {
-			expectedTag: tag.Tag{},
+			expectedTag: core.Tag{},
 			expectedErr: errors.New("error on provider.GetByName"),
 		},
 	}

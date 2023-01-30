@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/limeiralucas/chrono-cli/internal/tag"
-	"github.com/limeiralucas/chrono-cli/internal/time_entry"
-	"github.com/limeiralucas/chrono-cli/mocks"
+	core "github.com/limeiralucas/chrono-cli/internal/core/tag"
+	"github.com/limeiralucas/chrono-cli/internal/pkg/time_entry"
+	"github.com/limeiralucas/chrono-cli/internal/pkg/time_entry/mocks"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -88,13 +88,13 @@ func (s *TestSuite) Test_GetTags() {
 	t := s.T()
 
 	type ExpectedReturn struct {
-		expectedTags []tag.Tag
+		expectedTags []core.Tag
 		expectedErr  error
 	}
 
 	cases := map[string]ExpectedReturn{
 		"should call provider.GetTags and return tags": {
-			expectedTags: []tag.Tag{
+			expectedTags: []core.Tag{
 				{Id: 1, Name: "Tag 1"},
 				{Id: 2, Name: "Tag 2"},
 			},
@@ -131,7 +131,7 @@ func (s *TestSuite) Test_AddTags() {
 	for name, expectedErr := range cases {
 		s.ResetMocks()
 		s.Run(name, func() {
-			newTags := []tag.Tag{
+			newTags := []core.Tag{
 				{Id: 1, Name: "Tag 1"},
 				{Id: 2, Name: "Tag 2"},
 			}
@@ -156,7 +156,7 @@ func (s *TestSuite) Test_RemoveTags() {
 	for name, expectedErr := range cases {
 		s.ResetMocks()
 		s.Run(name, func() {
-			tagsToBeRemoved := []tag.Tag{
+			tagsToBeRemoved := []core.Tag{
 				{Id: 1, Name: "Tag 1"},
 				{Id: 2, Name: "Tag 2"},
 			}
