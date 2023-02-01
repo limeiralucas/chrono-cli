@@ -2,7 +2,7 @@ package toggl_test
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -32,7 +32,7 @@ func (s *TestSuite) Test_GetAuthenticated() {
 	var req *http.Request
 	mockResp := &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(bytes.NewReader([]byte(`[]`))),
+		Body:       io.NopCloser(bytes.NewReader([]byte(`[]`))),
 	}
 	s.httpClient.On("Do", mock.AnythingOfType("*http.Request")).Run(func(args mock.Arguments) {
 		req = args.Get(0).(*http.Request)
