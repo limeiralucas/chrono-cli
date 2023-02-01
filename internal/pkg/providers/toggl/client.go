@@ -20,7 +20,7 @@ func NewClient(apiKey string) Client {
 	return Client{ApiKey: apiKey, HttpClient: &http.Client{}}
 }
 
-func (c *Client) Get(path string) ([]map[string]interface{}, error) {
+func (c *Client) Get(path string) (any, error) {
 	url := fmt.Sprintf("%s%s", API_URL, path)
 
 	request, err := http.NewRequest(http.MethodGet, url, nil)
