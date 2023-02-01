@@ -1,13 +1,38 @@
 package toggl
 
+import (
+	"fmt"
+	"net/http"
+)
+
+const API_URL = "https://api.track.toggl.com/api/v9"
+
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
 type Client struct {
-	apiKey string
+	ApiKey     string
+	HttpClient HTTPClient
 }
 
 func NewClient(apiKey string) Client {
-	return Client{apiKey: apiKey}
+	return Client{ApiKey: apiKey, HttpClient: &http.Client{}}
 }
 
-// func (c *Client) Get(path string) map[string]interface{} {
+func (c *Client) Get(path string) ([]map[string]interface{}, error) {
+	url := fmt.Sprintf("%s%s", API_URL, path)
 
-// }
+	request, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	request.SetBasicAuth("api_key", c.ApiKey)
+
+	_, err = c.HttpClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
