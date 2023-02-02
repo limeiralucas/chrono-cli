@@ -12,17 +12,17 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type TestSuite struct {
+type ClientTestSuite struct {
 	suite.Suite
 	client     toggl.Client
 	httpClient *mocks.HTTPClient
 }
 
 func TestClient(t *testing.T) {
-	suite.Run(t, new(TestSuite))
+	suite.Run(t, new(ClientTestSuite))
 }
 
-func (s *TestSuite) SetupSuite() {
+func (s *ClientTestSuite) SetupSuite() {
 	s.httpClient = mocks.NewHTTPClient(s.T())
 	s.client = toggl.NewClient("fake-api-key")
 	s.client.HttpClient = s.httpClient
@@ -32,7 +32,7 @@ func createBody(jsonStr string) io.ReadCloser {
 	return io.NopCloser(bytes.NewReader([]byte(jsonStr)))
 }
 
-func (s *TestSuite) Test_GetAuthenticated() {
+func (s *ClientTestSuite) Test_GetAuthenticated() {
 	var req *http.Request
 	mockResp := &http.Response{
 		StatusCode: 200,
@@ -49,7 +49,7 @@ func (s *TestSuite) Test_GetAuthenticated() {
 	s.Equal("api_token", password)
 }
 
-func (s *TestSuite) Test_GetWithQuery() {
+func (s *ClientTestSuite) Test_GetWithQuery() {
 	var req *http.Request
 	mockResp := &http.Response{
 		StatusCode: 200,
@@ -71,7 +71,7 @@ func (s *TestSuite) Test_GetWithQuery() {
 	s.Equal(querySent.Get("param2"), "2")
 }
 
-func (s *TestSuite) Test_GetResponse() {
+func (s *ClientTestSuite) Test_GetResponse() {
 	mockResp := &http.Response{
 		StatusCode: 200,
 		Body:       createBody("[]"),
@@ -79,8 +79,22 @@ func (s *TestSuite) Test_GetResponse() {
 
 	s.httpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(mockResp, nil).Once()
 
-	body, err := s.client.Get("/", nil)
+	body, _, err := s.client.Get("/", nil)
 
 	s.Nil(err)
 	s.Equal([]byte("[]"), body)
+}
+
+func (s *ClientTestSuite) Test_GetStatusCode() {
+	mockResp := &http.Response{
+		StatusCode: 401,
+		Body:       createBody("Not Authorized"),
+	}
+
+	s.httpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(mockResp, nil).Once()
+
+	_, statusCode, err := s.client.Get("/", nil)
+
+	s.Nil(err)
+	s.Equal(401, statusCode)
 }

@@ -21,12 +21,12 @@ func NewClient(apiKey string) Client {
 	return Client{ApiKey: apiKey, HttpClient: &http.Client{}}
 }
 
-func (c *Client) Get(path string, query map[string]string) ([]byte, error) {
+func (c *Client) Get(path string, query map[string]string) ([]byte, int, error) {
 	url := fmt.Sprintf("%s%s", API_URL, path)
 
 	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	request.SetBasicAuth(c.ApiKey, "api_token")
 
@@ -41,19 +41,15 @@ func (c *Client) Get(path string, query map[string]string) ([]byte, error) {
 
 	response, err := c.HttpClient.Do(request)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	defer response.Body.Close()
 
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	if response.StatusCode != 200 {
-		return nil, fmt.Errorf("request to %s; status code: %d; body: %s", request.URL.String(), response.StatusCode, string(body))
-	}
-
-	return body, nil
+	return body, response.StatusCode, nil
 }
