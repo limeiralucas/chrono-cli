@@ -20,7 +20,7 @@ func NewClient(apiKey string) Client {
 	return Client{ApiKey: apiKey, HttpClient: &http.Client{}}
 }
 
-func (c *Client) Get(path string) (any, error) {
+func (c *Client) Get(path string, query map[string]string) (any, error) {
 	url := fmt.Sprintf("%s%s", API_URL, path)
 
 	request, err := http.NewRequest(http.MethodGet, url, nil)
@@ -28,6 +28,15 @@ func (c *Client) Get(path string) (any, error) {
 		return nil, err
 	}
 	request.SetBasicAuth("api_key", c.ApiKey)
+
+	if query != nil {
+		urlQuery := request.URL.Query()
+
+		for name, value := range query {
+			urlQuery.Add(name, value)
+		}
+		request.URL.RawQuery = urlQuery.Encode()
+	}
 
 	_, err = c.HttpClient.Do(request)
 	if err != nil {

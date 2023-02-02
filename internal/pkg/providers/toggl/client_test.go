@@ -42,9 +42,31 @@ func (s *TestSuite) Test_GetAuthenticated() {
 		req = args.Get(0).(*http.Request)
 	}).Return(mockResp, nil).Once()
 
-	s.client.Get("/")
+	s.client.Get("/", nil)
 	username, password, _ := req.BasicAuth()
 
 	s.Equal("api_key", username)
 	s.Equal("fake-api-key", password)
+}
+
+func (s *TestSuite) Test_GetWithQuery() {
+	var req *http.Request
+	mockResp := &http.Response{
+		StatusCode: 200,
+		Body:       createBody("[]"),
+	}
+
+	s.httpClient.On("Do", mock.AnythingOfType("*http.Request")).Run(func(args mock.Arguments) {
+		req = args.Get(0).(*http.Request)
+	}).Return(mockResp, nil).Once()
+
+	s.client.Get("/", map[string]string{
+		"param1": "1",
+		"param2": "2",
+	})
+
+	querySent := req.URL.Query()
+
+	s.Equal(querySent.Get("param1"), "1")
+	s.Equal(querySent.Get("param2"), "2")
 }
