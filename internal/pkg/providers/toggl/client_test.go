@@ -70,3 +70,17 @@ func (s *TestSuite) Test_GetWithQuery() {
 	s.Equal(querySent.Get("param1"), "1")
 	s.Equal(querySent.Get("param2"), "2")
 }
+
+func (s *TestSuite) Test_GetResponse() {
+	mockResp := &http.Response{
+		StatusCode: 200,
+		Body:       createBody("[]"),
+	}
+
+	s.httpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(mockResp, nil).Once()
+
+	body, err := s.client.Get("/", nil)
+
+	s.Nil(err)
+	s.Equal([]byte("[]"), body)
+}

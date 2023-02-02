@@ -2,6 +2,7 @@ package toggl
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 )
 
@@ -20,7 +21,7 @@ func NewClient(apiKey string) Client {
 	return Client{ApiKey: apiKey, HttpClient: &http.Client{}}
 }
 
-func (c *Client) Get(path string, query map[string]string) (any, error) {
+func (c *Client) Get(path string, query map[string]string) ([]byte, error) {
 	url := fmt.Sprintf("%s%s", API_URL, path)
 
 	request, err := http.NewRequest(http.MethodGet, url, nil)
@@ -38,10 +39,17 @@ func (c *Client) Get(path string, query map[string]string) (any, error) {
 		request.URL.RawQuery = urlQuery.Encode()
 	}
 
-	_, err = c.HttpClient.Do(request)
+	response, err := c.HttpClient.Do(request)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, nil
+	defer response.Body.Close()
+
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return body, nil
 }
