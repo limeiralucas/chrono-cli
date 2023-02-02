@@ -28,7 +28,7 @@ func (c *Client) Get(path string, query map[string]string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	request.SetBasicAuth("api_key", c.ApiKey)
+	request.SetBasicAuth(c.ApiKey, "api_token")
 
 	if query != nil {
 		urlQuery := request.URL.Query()
@@ -49,6 +49,10 @@ func (c *Client) Get(path string, query map[string]string) ([]byte, error) {
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, err
+	}
+
+	if response.StatusCode != 200 {
+		return nil, fmt.Errorf("request to %s; status code: %d; body: %s", request.URL.String(), response.StatusCode, string(body))
 	}
 
 	return body, nil

@@ -45,8 +45,8 @@ func (s *TestSuite) Test_GetAuthenticated() {
 	s.client.Get("/", nil)
 	username, password, _ := req.BasicAuth()
 
-	s.Equal("api_key", username)
-	s.Equal("fake-api-key", password)
+	s.Equal("fake-api-key", username)
+	s.Equal("api_token", password)
 }
 
 func (s *TestSuite) Test_GetWithQuery() {
