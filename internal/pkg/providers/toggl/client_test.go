@@ -18,7 +18,7 @@ type ClientTestSuite struct {
 	httpClient *mocks.HTTPClient
 }
 
-func TestClient(t *testing.T) {
+func Test_Client(t *testing.T) {
 	suite.Run(t, new(ClientTestSuite))
 }
 
@@ -32,69 +32,62 @@ func createBody(jsonStr string) io.ReadCloser {
 	return io.NopCloser(bytes.NewReader([]byte(jsonStr)))
 }
 
-func (s *ClientTestSuite) Test_GetAuthenticated() {
-	var req *http.Request
-	mockResp := &http.Response{
-		StatusCode: 200,
-		Body:       createBody("[]"),
-	}
-	s.httpClient.On("Do", mock.AnythingOfType("*http.Request")).Run(func(args mock.Arguments) {
-		req = args.Get(0).(*http.Request)
-	}).Return(mockResp, nil).Once()
-
-	s.client.Get("/", nil)
-	username, password, _ := req.BasicAuth()
-
-	s.Equal("fake-api-key", username)
-	s.Equal("api_token", password)
-}
-
-func (s *ClientTestSuite) Test_GetWithQuery() {
-	var req *http.Request
-	mockResp := &http.Response{
-		StatusCode: 200,
-		Body:       createBody("[]"),
+func (s *ClientTestSuite) Test_Get() {
+	type TestCase struct {
+		statusCode int
+		body       string
+		query      map[string]string
 	}
 
-	s.httpClient.On("Do", mock.AnythingOfType("*http.Request")).Run(func(args mock.Arguments) {
-		req = args.Get(0).(*http.Request)
-	}).Return(mockResp, nil).Once()
-
-	s.client.Get("/", map[string]string{
-		"param1": "1",
-		"param2": "2",
-	})
-
-	querySent := req.URL.Query()
-
-	s.Equal(querySent.Get("param1"), "1")
-	s.Equal(querySent.Get("param2"), "2")
-}
-
-func (s *ClientTestSuite) Test_GetResponse() {
-	mockResp := &http.Response{
-		StatusCode: 200,
-		Body:       createBody("[]"),
+	testCases := map[string]TestCase{
+		"should make a authenticated request": {
+			statusCode: 200,
+			body:       "[]",
+			query:      nil,
+		},
+		"should make a request with the provided query params": {
+			statusCode: 200,
+			body:       "[]",
+			query: map[string]string{
+				"param1": "1",
+				"param2": "2",
+			},
+		},
+		"should return the response body": {
+			statusCode: 200,
+			body:       `{"id": 1}`,
+			query:      nil,
+		},
+		"should return the http status code": {
+			statusCode: 401,
+			body:       "[]",
+			query:      nil,
+		},
 	}
 
-	s.httpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(mockResp, nil).Once()
+	for name, c := range testCases {
+		s.Run(name, func() {
+			var req *http.Request
+			mockResp := &http.Response{
+				StatusCode: c.statusCode,
+				Body:       createBody(c.body),
+			}
+			s.httpClient.On("Do", mock.AnythingOfType("*http.Request")).Run(func(args mock.Arguments) {
+				req = args.Get(0).(*http.Request)
+			}).Return(mockResp, nil).Once()
 
-	body, _, err := s.client.Get("/", nil)
+			body, statusCode, _ := s.client.Get("/", c.query)
+			username, password, _ := req.BasicAuth()
+			querySent := req.URL.Query()
 
-	s.Nil(err)
-	s.Equal([]byte("[]"), body)
-}
+			s.Equal("fake-api-key", username)
+			s.Equal("api_token", password)
+			s.Equal([]byte(c.body), body)
+			s.Equal(c.statusCode, statusCode)
 
-func (s *ClientTestSuite) Test_GetStatusCode() {
-	mockResp := &http.Response{
-		StatusCode: 401,
-		Body:       createBody("Not Authorized"),
+			for key, value := range c.query {
+				s.Equal(querySent.Get(key), value)
+			}
+		})
 	}
-
-	s.httpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(mockResp, nil).Once()
-
-	_, statusCode, err := s.client.Get("/", nil)
-
-	s.Nil(err)
-	s.Equal(401, statusCode)
 }
