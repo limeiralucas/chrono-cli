@@ -7,7 +7,7 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() error {
-	rootCmd.AddCommand(convertCmd)
+	rootCmd.AddCommand(togglCmd)
 
 	return rootCmd.Execute()
 }
