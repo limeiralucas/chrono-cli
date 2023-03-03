@@ -45,7 +45,7 @@ var listCmd = &cobra.Command{
 		}
 
 		for _, entry := range entries {
-			fmt.Printf("%s: %s - %s\n", entry.Description, entry.StartDate, entry.EndDate)
+			fmt.Printf("%s: %.2f\n", entry.Description, float64(entry.Duration)/60/60)
 		}
 
 		return nil
