@@ -1,6 +1,8 @@
 package app
 
 import (
+	"time"
+
 	"github.com/limeiralucas/chrono-cli/pkg/domain"
 )
 
@@ -29,8 +31,8 @@ func (ts timeEntryService) GetCurrent() (*domain.TimeEntry, error) {
 }
 
 // List implements domain.TimeEntryService
-func (ts timeEntryService) List() ([]*domain.TimeEntry, error) {
-	return ts.DB.List()
+func (ts timeEntryService) List(startTime time.Time, endTime time.Time) ([]*domain.TimeEntry, error) {
+	return ts.DB.List(startTime, endTime)
 }
 
 func NewTimeEntryService(db domain.TimeEntryDB) domain.TimeEntryService {

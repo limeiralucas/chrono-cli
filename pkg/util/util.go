@@ -11,7 +11,7 @@ func GetWeekStartAndEnd(tm time.Time) (time.Time, time.Time) {
 	weekday := tm.Weekday()
 
 	year, month, day := tm.Date()
-	dayStart := time.Date(year, month, day, 0, 0, 0, 0, time.Local)
+	dayStart := time.Date(year, month, day, 0, 0, 0, 0, tm.Location())
 
 	weekStart := dayStart.Add(-time.Duration(weekday) * dayDuration)
 	weekEnd := weekStart.Add(weekDuration - time.Duration(time.Second))

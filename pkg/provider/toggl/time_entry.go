@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/limeiralucas/chrono-cli/pkg/domain"
 )
@@ -68,7 +69,7 @@ func (t *TimeEntryProvider) GetCurrent() (*domain.TimeEntry, error) {
 	return &timeEntry, nil
 }
 
-func (t *TimeEntryProvider) List() ([]*domain.TimeEntry, error) {
+func (t *TimeEntryProvider) List(startTime time.Time, endTime time.Time) ([]*domain.TimeEntry, error) {
 	url := fmt.Sprintf("%s%s", API_HOST, "/me/time_entries")
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -77,6 +78,11 @@ func (t *TimeEntryProvider) List() ([]*domain.TimeEntry, error) {
 	}
 
 	req.SetBasicAuth(t.apiKey, "api_token")
+	query := req.URL.Query()
+	query.Add("start_date", startTime.Format(time.RFC3339))
+	query.Add("end_date", endTime.Format(time.RFC3339))
+	req.URL.RawQuery = query.Encode()
+
 	res, err := Client.Do(req)
 	if err != nil {
 		return nil, err

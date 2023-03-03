@@ -39,7 +39,7 @@ type TimeEntry struct {
 
 type TimeEntryService interface {
 	GetCurrent() (*TimeEntry, error)
-	List() ([]*TimeEntry, error)
+	List(startTime time.Time, endTime time.Time) ([]*TimeEntry, error)
 	Create(timeEntry *TimeEntry) (int, error)
 	Update(timeEntry *TimeEntry) error
 	Delete(id int) error
@@ -47,7 +47,7 @@ type TimeEntryService interface {
 
 type TimeEntryDB interface {
 	GetCurrent() (*TimeEntry, error)
-	List() ([]*TimeEntry, error)
+	List(startTime time.Time, endTime time.Time) ([]*TimeEntry, error)
 	Create(timeEntry *TimeEntry) (int, error)
 	Update(timeEntry *TimeEntry) error
 	Delete(id int) error

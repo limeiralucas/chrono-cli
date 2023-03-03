@@ -3,10 +3,12 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/limeiralucas/chrono-cli/pkg/app"
 	"github.com/limeiralucas/chrono-cli/pkg/config"
 	toggl_provider "github.com/limeiralucas/chrono-cli/pkg/provider/toggl"
+	"github.com/limeiralucas/chrono-cli/pkg/util"
 	"github.com/spf13/cobra"
 )
 
@@ -31,13 +33,13 @@ var listCmd = &cobra.Command{
 		if week > 0 {
 			return errors.New("week flag must be less or equal to 0")
 		}
-		// weekDate := util.AddWeek(time.Now().UTC(), week)
-		// weekStart, weekEnd := util.GetWeekStartAndEnd(weekDate)
+		weekDate := util.AddWeek(time.Now().UTC(), week)
+		weekStart, weekEnd := util.GetWeekStartAndEnd(weekDate)
 
 		provider := toggl_provider.NewTimeEntryProvider(config.Token)
 		service := app.NewTimeEntryService(&provider)
 
-		entries, err := service.List()
+		entries, err := service.List(weekStart, weekEnd)
 		if err != nil {
 			return err
 		}

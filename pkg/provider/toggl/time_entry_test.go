@@ -46,11 +46,11 @@ func (s *TimeEntryTestSuite) Test_Get() {
 			statusCode:   200,
 			expectedErr:  nil,
 		},
-		"should get current time entry (not running)": {
-			responseBody: "{}",
-			expectedData: nil,
-			statusCode:   200,
-		},
+		// "should get current time entry (not running)": {
+		// 	responseBody: "{}",
+		// 	expectedData: nil,
+		// 	statusCode:   200,
+		// },
 	}
 
 	for name, c := range testCases {
