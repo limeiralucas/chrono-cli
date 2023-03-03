@@ -31,7 +31,7 @@ func createBody(jsonStr string) io.ReadCloser {
 	return io.NopCloser(bytes.NewReader([]byte(jsonStr)))
 }
 
-func (s *TimeEntryTestSuite) Test_Get() {
+func (s *TimeEntryTestSuite) Test_GetCurrent() {
 	type TestCase struct {
 		responseBody string
 		statusCode   int
