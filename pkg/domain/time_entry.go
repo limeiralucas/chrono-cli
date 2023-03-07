@@ -36,6 +36,7 @@ type TimeEntry struct {
 	StartDate   TimeEntryTime `json:"start" bson:"start,omitempty"`
 	EndDate     TimeEntryTime `json:"stop" bson:"stop,omitempty"`
 	Duration    int           `json:"duration" bson:"duration,omitempty"`
+	Tags        []string      `json:"tags" bson:"tags,omitempty"`
 }
 
 type TimeEntryService interface {
