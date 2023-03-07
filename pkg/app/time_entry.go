@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/limeiralucas/chrono-cli/pkg/domain"
@@ -36,6 +37,7 @@ func (ts timeEntryService) List(startTime time.Time, endTime time.Time) ([]*doma
 }
 
 func (ts timeEntryService) ElapsedTimeByDay(startTime time.Time, endTime time.Time) (map[string]float32, error) {
+	tag := ""
 	elapsedTime := map[string]float32{}
 	entries, err := ts.List(startTime, endTime)
 	if err != nil {
@@ -43,12 +45,19 @@ func (ts timeEntryService) ElapsedTimeByDay(startTime time.Time, endTime time.Ti
 	}
 
 	for _, entry := range entries {
+		if len(entry.Tags) > 0 {
+			tag = fmt.Sprintf(" (%s)", entry.Tags[0])
+		} else {
+			tag = ""
+		}
+
 		day := entry.StartDate.Format("02/01")
+		key := fmt.Sprintf("%s%s", day, tag)
 		elapsed, ok := elapsedTime[day]
 		if !ok {
 			elapsed = 0
 		}
-		elapsedTime[day] = elapsed + float32(entry.Duration)/60/60
+		elapsedTime[key] = elapsed + float32(entry.Duration)/60/60
 	}
 
 	return elapsedTime, nil
