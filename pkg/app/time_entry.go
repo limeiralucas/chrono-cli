@@ -35,6 +35,25 @@ func (ts timeEntryService) List(startTime time.Time, endTime time.Time) ([]*doma
 	return ts.DB.List(startTime, endTime)
 }
 
+func (ts timeEntryService) ElapsedTimeByDay(startTime time.Time, endTime time.Time) (map[string]float32, error) {
+	elapsedTime := map[string]float32{}
+	entries, err := ts.List(startTime, endTime)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, entry := range entries {
+		day := entry.StartDate.Format("02/01")
+		elapsed, ok := elapsedTime[day]
+		if !ok {
+			elapsed = 0
+		}
+		elapsedTime[day] = elapsed + float32(entry.Duration)/60/60
+	}
+
+	return elapsedTime, nil
+}
+
 func NewTimeEntryService(db domain.TimeEntryDB) domain.TimeEntryService {
 	return timeEntryService{
 		DB: db,

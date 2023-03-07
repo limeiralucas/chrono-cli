@@ -41,6 +41,7 @@ type TimeEntry struct {
 type TimeEntryService interface {
 	GetCurrent() (*TimeEntry, error)
 	List(startTime time.Time, endTime time.Time) ([]*TimeEntry, error)
+	ElapsedTimeByDay(startTime time.Time, endTime time.Time) (map[string]float32, error)
 	Create(timeEntry *TimeEntry) (int, error)
 	Update(timeEntry *TimeEntry) error
 	Delete(id int) error

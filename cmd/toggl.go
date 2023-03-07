@@ -39,13 +39,14 @@ var listCmd = &cobra.Command{
 		provider := toggl_provider.NewTimeEntryProvider(config.Token)
 		service := app.NewTimeEntryService(&provider)
 
-		entries, err := service.List(weekStart, weekEnd)
+		elapsedTime, err := service.ElapsedTimeByDay(weekStart, weekEnd)
 		if err != nil {
 			return err
 		}
 
-		for _, entry := range entries {
-			fmt.Printf("%s: %.2f\n", entry.Description, float64(entry.Duration)/60/60)
+		fmt.Printf("Week: %s - %s\n\n", weekStart.Format("02/01"), weekEnd.Format("02/01"))
+		for day, elapsed := range elapsedTime {
+			fmt.Printf("%s: %.2f\n", day, elapsed)
 		}
 
 		return nil
