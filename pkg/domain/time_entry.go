@@ -4,6 +4,8 @@ import (
 	"time"
 )
 
+type TagReport = map[string][]*TimeEntry
+
 type TimeEntryTime struct {
 	time.Time
 }
@@ -43,6 +45,7 @@ type TimeEntryService interface {
 	GetCurrent() (*TimeEntry, error)
 	List(startTime time.Time, endTime time.Time) ([]*TimeEntry, error)
 	ElapsedTimeByDay(startTime time.Time, endTime time.Time) (map[string]float32, error)
+	TimeReport(startTime time.Time, endTime time.Time) (map[string]TagReport, error)
 	Create(timeEntry *TimeEntry) (int, error)
 	Update(timeEntry *TimeEntry) error
 	Delete(id int) error
