@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -39,6 +40,27 @@ type TimeEntry struct {
 	EndDate     TimeEntryTime `json:"stop" bson:"stop,omitempty"`
 	Duration    int           `json:"duration" bson:"duration,omitempty"`
 	Tags        []string      `json:"tags" bson:"tags,omitempty"`
+}
+
+func (t TimeEntry) DurationInHours() float32 {
+	return float32(t.Duration) / 60 / 60
+}
+
+func (t TimeEntry) String() string {
+	repr := ""
+	if t.Description != "" {
+		repr += t.Description
+	} else {
+		repr += "<No title>"
+	}
+
+	if t.Duration > 0 {
+		repr += fmt.Sprintf(" (%.2f)", t.DurationInHours())
+	} else {
+		repr += " (running)"
+	}
+
+	return repr
 }
 
 type TimeEntryService interface {
