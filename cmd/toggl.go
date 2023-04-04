@@ -121,6 +121,8 @@ var reportCmd = &cobra.Command{
 						tagTotalDuration += entry.DurationInHours()
 					}
 				}
+				dayTotalDuration += tagTotalDuration
+
 				reportStr += fmt.Sprintf("\n- [other] (%.2f)\n", tagTotalDuration)
 				reportStr += fmt.Sprint(entriesDetails)
 			}
